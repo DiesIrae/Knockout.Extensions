@@ -106,7 +106,7 @@
                     if (ko.isObservable(binding.dataSource)) {
                         // Subscribe to the dataSource observable.  This callback will fire whenever items are added to 
                         // and removed from the data source.
-                        binding.dataSource.subscribe(function (newItems) {
+                        var subscribed = binding.dataSource.subscribe(function (newItems) {
                             // ** Redraw table **
                             var dataTable = $(element).dataTable();
                             setDataTableInstanceOnBinding(dataTable, binding.table);
@@ -140,6 +140,11 @@
                             // this any earlier will modify the tables rows, which may cause issues with third party plugins that 
                             // use the data table.
                             ko.utils.arrayForEach(tableRows, function (tableRow) { ko.cleanNode(tableRow); });
+                        });
+
+                        // Disposal of subscription on node remove by ko
+                        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+                            subscribed.dispose();
                         });
                     }
                 }
