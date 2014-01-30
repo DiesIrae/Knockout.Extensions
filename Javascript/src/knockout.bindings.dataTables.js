@@ -12,6 +12,69 @@
 */
 
 (function () {
+    var configureColumnsWithCategories = function(element, columns, bigCells) {
+        var hasCategories = false;
+
+        $.each(columns, function(i, column) {
+            if(column.category) {
+                hasCategories = true;
+                return false;
+            }
+        });
+
+        var head = $("<thead/>");
+        var firstRow = $("<tr/>");
+        var secondRow = $("<tr/>");
+        var currentCategory;
+        var currentCategoryCell;
+        var currentColspan;
+
+        $.each(columns, function(i, column) {
+            var titleCell = $("<th/>");
+            var rowToAddTitle = firstRow;
+
+            if(hasCategories) {
+                if(bigCells && (! column.category)) {
+                    titleCell
+                    .attr("rowspan", 2)
+                    .addClass("big-cell");
+
+                    currentCategory = undefined;
+                    currentCategoryCell = undefined;
+                }
+                else if(currentCategoryCell && column.category == currentCategory) {
+                    rowToAddTitle = secondRow;
+                    currentColspan++;
+                    currentCategoryCell.attr("colspan", currentColspan);
+                }
+                else {
+                    rowToAddTitle = secondRow;
+                    var categoryCell = $("<th/>").text(column.category);
+                    if(column.category) {
+                        categoryCell.addClass("category-cell");
+                    }
+                    else {
+                        categoryCell.addClass("empty-category-cell");
+                    }
+                    firstRow.append(categoryCell);
+
+                    currentCategory = column.category;
+                    currentCategoryCell = categoryCell;
+                    currentColspan = 1;
+                }
+            }
+            rowToAddTitle.append(titleCell);
+        });
+
+        head.append(firstRow);
+
+        if(hasCategories) {
+            head.append(secondRow);
+        }
+
+        $(element).append(head);
+    }
+    
     var addTableContext = function(bindingContext, element) {
         return bindingContext.extend({rowOptions: element.rowOptions});
     }
@@ -60,6 +123,9 @@
                     options.aoColumns.push(col);
                 })
             }
+
+            var bigCells = true;
+            configureColumnsWithCategories(element, binding.options.aoColumns, bigCells);
 
             // Support for computed template name and templates that change
             var rowTemplate = ko.utils.unwrapObservable(binding.rowTemplate);
