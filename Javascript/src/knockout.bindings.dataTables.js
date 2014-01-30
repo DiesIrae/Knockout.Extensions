@@ -12,6 +12,10 @@
 */
 
 (function () {
+    var addTableContext = function(bindingContext, element) {
+        return bindingContext.extend({rowOptions: element.rowOptions});
+    }
+    
     var _onInitialisingEventName = "ko_bindingHandlers_dataTable_onInitialising",
         _dataTablesInstanceDataKey = "ko_bindingHandlers_dataTable_Instance";
 
@@ -71,7 +75,7 @@
                 // Intercept the fnRowCallback function.
                 options.fnRowCallback = cog.utils.intercept(options.fnRowCallback || function (row) { return row; }, function (row, data, displayIndex, displayIndexFull, next) {
                     // Render the row template for this row.
-                    ko.renderTemplate(rowTemplate, bindingContext.createChildContext(data), null, row, "replaceChildren");
+                    ko.renderTemplate(rowTemplate, addTableContext(bindingContext, valueAccessor()).createChildContext(data), null, row, "replaceChildren");
                     return next(row, data, displayIndex, displayIndexFull);
                 });
             }
