@@ -202,7 +202,8 @@
                             dataTable.fnAddData(unwrappedItems);
 
 							 // Get a list of rows in the DataTable.
-							var tableRows = dataTable.fnGetNodes();
+							 // KP : does not functions, makes delete unusable
+							// var tableRows = dataTable.fnGetNodes();
 							
                             // Unregister each of the table rows from knockout.
                             // NB: This must be called after fnAddData and fnClearTable are called because we want to allow
